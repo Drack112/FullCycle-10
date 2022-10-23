@@ -1,0 +1,6 @@
+node_modules/
+dist/
+coverage/
+Dockerfile
+README.md
+.docker/dbdata

@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  app:
+    container_name: nestjs-app
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/home/node/app
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+      - 3000:3000
+    entrypoint: ./.docker/entrypoints/dev.sh
+    env_file:
+      - .env
+    depends_on:
+      - db
+    extra_hosts:
+      - 'host.docker.internal:172.17.0.1'
+    networks:
+      - webnet
+
+  db:
+    image: mongo:4.4.4
+    restart: always
+    volumes:
+      - ./.docker/dbdata:/data/db
+      - ./.docker/mongo:/docker-entrypoint-initdb.d
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=nest
+    networks:
+      - webnet
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=db
+      - ME_CONFIG_MONGODB_AUTH_USERNAME=root
+      - ME_CONFIG_MONGODB_AUTH_PASSWORD=root
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=root
+    networks:
+      - webnet
+    depends_on:
+      - db
+
+networks:
+  webnet:
+    driver: bridge

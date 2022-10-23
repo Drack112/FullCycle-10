@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  app:
+    container_name: react-app
+    build:
+      context: .
+      target: production
+    #entrypoint: ./.docker/entrypoint.sh
+    volumes:
+      - .:/home/app
+      - ./node_modules:/home/app/node_modules
+    ports:
+      - 4000:4000
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
